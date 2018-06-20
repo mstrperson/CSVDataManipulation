@@ -30,6 +30,12 @@ namespace CSVDataManipulation
             _Data = new List<Dictionary<string, string>>();
         }
 
+        public CSV(List<Dictionary<String, String>> data)
+        {
+            Heading = "";
+            _Data = data;
+        }
+
         public CSV(Stream inputStream)
         {
             Heading = "";
