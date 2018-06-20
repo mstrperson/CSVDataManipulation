@@ -31,8 +31,13 @@ namespace CSVDataManipulation
     public class YesBeatsNoConflictRule : IConflictRule
     {
         /// <summary>
+        /// The next rule in the conflict rule chain.
+        /// </summary>
+        public IConflictRule NextRule;
+
+        /// <summary>
         /// Check to see if Yes or No, and Yes wins!
-        /// otherwise, hand off to a UserResolveConflictRule
+        /// otherwise, hand off to the next rule
         /// </summary>
         /// <returns>The resolve.</returns>
         /// <param name="dataA">Data a.</param>
@@ -43,8 +48,7 @@ namespace CSVDataManipulation
             if (dataA[conflictColumn].ToLower().Equals("n") && dataB[conflictColumn].ToLower().Equals("y")) return "y";
             if (dataB[conflictColumn].ToLower().Equals("n") && dataA[conflictColumn].ToLower().Equals("y")) return "y";
 
-            UserResolveConflictRule rule = new UserResolveConflictRule();
-            return rule.Resolve(dataA, dataB, conflictColumn);
+            return NextRule.Resolve(dataA, dataB, conflictColumn);
         }
     }
 }
