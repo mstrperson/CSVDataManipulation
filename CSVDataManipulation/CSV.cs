@@ -216,12 +216,12 @@ namespace CSVDataManipulation
         public void Save(String fileName)
         {
             //"\\/:\\*\\?\"<>\\|"
-            fileName = fileName.Replace("/", "\\");
-            Regex invalid = new Regex("[\\*\\?\"<>\\|]");
-            foreach (Match match in invalid.Matches(fileName))
+            //fileName = fileName.Replace("/", "\\");
+            //Regex invalid = new Regex("[\\*\\?\"<>\\|]");
+            /*foreach (Match match in invalid.Matches(fileName))
             {
                 fileName = fileName.Replace(match.Value, "");
-            }
+            }*/
             if (File.Exists(fileName)) File.Delete(fileName);
             this.Save(new FileStream(fileName, FileMode.OpenOrCreate));
         }
