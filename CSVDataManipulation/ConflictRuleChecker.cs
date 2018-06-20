@@ -27,4 +27,24 @@ namespace CSVDataManipulation
             }
         }
     }
+
+    public class YesBeatsNoConflictRule : IConflictRule
+    {
+        /// <summary>
+        /// Check to see if Yes or No, and Yes wins!
+        /// otherwise, hand off to a UserResolveConflictRule
+        /// </summary>
+        /// <returns>The resolve.</returns>
+        /// <param name="dataA">Data a.</param>
+        /// <param name="dataB">Data b.</param>
+        /// <param name="conflictColumn">Conflict column.</param>
+        public string Resolve(Dictionary<string, string> dataA, Dictionary<string, string> dataB, string conflictColumn)
+        {
+            if (dataA[conflictColumn].ToLower().Equals("n") && dataB[conflictColumn].ToLower().Equals("y")) return "y";
+            if (dataB[conflictColumn].ToLower().Equals("n") && dataA[conflictColumn].ToLower().Equals("y")) return "y";
+
+            UserResolveConflictRule rule = new UserResolveConflictRule();
+            return rule.Resolve(dataA, dataB, conflictColumn);
+        }
+    }
 }
