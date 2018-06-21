@@ -22,7 +22,7 @@ namespace CSVDataManipulation
         /// The conflict rule.
         /// Default is for the User to resolve the conflict on their own.
         /// </summary>
-        protected IConflictRule conflictRule = new YesBeatsNoConflictRule();
+        protected IConflictRule conflictRule = new YesBeatsNoConflictRule() { NextRule = new UserResolveConflictRule() };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CSVDataManipulation.ExtendedCSV"/> class.
