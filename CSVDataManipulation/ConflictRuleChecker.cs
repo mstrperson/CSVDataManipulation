@@ -48,6 +48,10 @@ namespace CSVDataManipulation
             if (dataA[conflictColumn].ToLower().Equals("n") && dataB[conflictColumn].ToLower().Equals("y")) return "y";
             if (dataB[conflictColumn].ToLower().Equals("n") && dataA[conflictColumn].ToLower().Equals("y")) return "y";
 
+            if (dataA[conflictColumn].ToLower().Equals("no") && dataB[conflictColumn].ToLower().Equals("yes")) return "yes";
+            if (dataB[conflictColumn].ToLower().Equals("no") && dataA[conflictColumn].ToLower().Equals("yes")) return "yes";
+
+
             return NextRule.Resolve(dataA, dataB, conflictColumn);
         }
     }
