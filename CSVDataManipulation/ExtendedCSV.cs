@@ -55,6 +55,8 @@ namespace CSVDataManipulation
             return true;
         }
 
+
+        #region flatten file
         /// <summary>
         /// Squashs the rows.
         /// </summary>
@@ -112,6 +114,43 @@ namespace CSVDataManipulation
             return destination;
         }
 
-       
+        #endregion // flatten
+
+        #region merge documents
+        
+        /// <summary>
+        /// Merge this ExtendedCSV with another CSV.  
+        /// The merger looks for matching unique field rows in the /other/ csv and merges them into this one.
+        /// 
+        /// </summary>
+        /// <param name="other">CSV with additional data.</param>
+        public void Merge(CSV other)
+        {
+            foreach (Dictionary<string, string> rowA in this.Data)
+            {
+                foreach (Dictionary<string, string> rowB in other.Data)
+                {
+                    if(CompareUniqueFields(rowA, rowB))
+                    {
+                        foreach(String column in rowB.Keys)
+                        {
+                            if(!rowA.ContainsKey(column))
+                            {
+                                // add the missing data to this sheet.
+                                rowA.Add(column, rowB[column]);
+                            }
+                            else if(!rowA[column].Equals(rowB[column]))
+                            {
+                                // check for conflicting data.
+                                rowA[column] = conflictRule.Resolve(rowA, rowB, column);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion // merge documents
+
     }
 }

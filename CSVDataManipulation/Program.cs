@@ -9,6 +9,17 @@ namespace CSVDataManipulation
     {
         public static void Main(string[] args)
         {
+            ExtendedCSV ext = new ExtendedCSV(new FileStream("C:\\temp\\test1.csv", FileMode.Open), new List<string>() { "id" });
+            CSV other = new CSV(new FileStream("C:\\temp\\test2.csv", FileMode.Open));
+
+            ext.Merge(other);
+            ext.Save("C:\\temp\\testOut.csv");
+            Console.WriteLine("Done!");
+            Console.ReadKey();
+        }
+
+        public static void Flatten()
+        {
             List<String> files = Directory.EnumerateFiles(String.Format("/Users/{0}/Documents/toFlatten/", Environment.UserName)).ToList();
 
             if (!Directory.Exists(String.Format("/Users/{0}/Documents/flattened", Environment.UserName)))
@@ -16,7 +27,7 @@ namespace CSVDataManipulation
 
             List<String> uniqueFields = new List<string>();
 
-            if(File.Exists(String.Format("/Users/{0}/Documents/toFlatten/.flatten.conf", Environment.UserName)))
+            if (File.Exists(String.Format("/Users/{0}/Documents/toFlatten/.flatten.conf", Environment.UserName)))
             {
                 StreamReader reader =
                     new StreamReader(
@@ -32,11 +43,11 @@ namespace CSVDataManipulation
                 // ask the user.
                 Console.WriteLine("What are the unique fields?  [Enter one at a time.  '*' to End.");
                 String field = "";
-                while(true)
+                while (true)
                 {
                     Console.Write(">> ");
                     field = Console.ReadLine();
-                    if (field.Equals("*")) 
+                    if (field.Equals("*"))
                         break;
                     else
                         uniqueFields.Add(field);
