@@ -5,6 +5,12 @@ using System.IO;
 
 namespace CSVDataManipulation
 {
+
+    /// <summary>
+    /// Extention of the CSV class which can be used for various data manipulation.
+    /// 
+    /// Currently implements flattening of CSV files given a list of primary keys.
+    /// </summary>
     public class ExtendedCSV : CSV
     {
         /// <summary>
@@ -20,9 +26,8 @@ namespace CSVDataManipulation
 
         /// <summary>
         /// The conflict rule.
-        /// Default is for the User to resolve the conflict on their own.
         /// </summary>
-        protected IConflictRule conflictRule = new YesBeatsNoConflictRule() { NextRule = new UserResolveConflictRule() };
+        public IConflictRule ConflictRule;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CSVDataManipulation.ExtendedCSV"/> class.
@@ -61,7 +66,7 @@ namespace CSVDataManipulation
         /// Squashs the rows.
         /// </summary>
         /// <returns>The rows.</returns>
-        public CSV SquashRows()
+        public CSV FlattenRows()
         {
             List<Dictionary<String, String>> output = new List<Dictionary<string, string>>();
 
@@ -91,7 +96,7 @@ namespace CSVDataManipulation
         /// <returns>The merge.</returns>
         /// <param name="destination">Destination.</param>
         /// <param name="row">Row.</param>
-        public Dictionary<String,String> Merge(Dictionary<string, string> destination, Dictionary<string, string> row)
+        protected Dictionary<String,String> Merge(Dictionary<string, string> destination, Dictionary<string, string> row)
         {
             List<string> keys = new List<string>();
 
@@ -106,7 +111,7 @@ namespace CSVDataManipulation
                     if (String.IsNullOrWhiteSpace(destination[key]))
                         destination[key] = row[key];
                     if (!destination[key].Equals(row[key]) && !String.IsNullOrWhiteSpace(row[key]))
-                        destination[key] = conflictRule.Resolve(destination, row, key);
+                        destination[key] = ConflictRule.Resolve(destination, row, key);
                     
                 }
             }

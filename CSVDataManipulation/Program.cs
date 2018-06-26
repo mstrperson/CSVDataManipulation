@@ -59,9 +59,17 @@ namespace CSVDataManipulation
                 if (!fileName.EndsWith(".csv", StringComparison.CurrentCultureIgnoreCase)) continue;
                 Console.WriteLine(fileName);
                 FileStream fileStream = new FileStream(fileName, FileMode.Open);
-                ExtendedCSV extendedCSV = new ExtendedCSV(fileStream, uniqueFields);
-                CSV output = extendedCSV.SquashRows();
-                string outfilename = fileName.Replace("toSquash", "flattened");
+
+                ExtendedCSV extendedCSV = new ExtendedCSV(fileStream, uniqueFields)
+                {
+                    ConflictRule = new YesBeatsNoConflictRule() 
+                                        { 
+                                            NextRule = new UserResolveConflictRule() 
+                                        }
+                };
+
+                CSV output = extendedCSV.FlattenRows();
+                string outfilename = fileName.Replace("toFlatten", "flattened");
                 output.Save(outfilename);
                 Console.WriteLine("Flattened: {0}", outfilename);
             }
