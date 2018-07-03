@@ -147,7 +147,7 @@ namespace CSVDataManipulation
                             else if(!rowA[column].Equals(rowB[column]))
                             {
                                 // check for conflicting data.
-                                rowA[column] = conflictRule.Resolve(rowA, rowB, column);
+                                rowA[column] = ConflictRule.Resolve(rowA, rowB, column);
                             }
                         }
                     }
@@ -156,6 +156,11 @@ namespace CSVDataManipulation
         }
 
         #endregion // merge documents
+
+        public void NormalizeColumns(INormalizationRule rule, List<String> columns)
+        {
+            rule.Normalize(ref _Data, columns);
+        }
 
     }
 }

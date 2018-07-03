@@ -37,6 +37,7 @@
     <Compile Include="CSV.cs" />
     <Compile Include="ExtendedCSV.cs" />
     <Compile Include="ConflictRuleChecker.cs" />
+    <Compile Include="NormalizationRule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

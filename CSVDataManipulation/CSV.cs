@@ -16,13 +16,13 @@ namespace CSVDataManipulation
         public String Heading
         { get; set; }
 
-        private List<Dictionary<String, String>> _Data;
+        protected List<Dictionary<String, String>> _Data;
         public List<Dictionary<String, String>> Data
         {
             get { return _Data; }
         }
 
-        private static Regex Quoted = new Regex("^\"[^\"]*\"$");
+        protected static Regex Quoted = new Regex("^\"[^\"]*\"$");
 
         public CSV(String heading = "")
         {
