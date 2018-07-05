@@ -157,6 +157,72 @@ namespace CSVDataManipulation
 
         #endregion // merge documents
 
+        #region Comparison
+
+        /// <summary>
+        /// Compares the other csv to this csv and returns a CSV containing all 
+        /// of the rows that are present in the Other but are missing from this csv.
+        /// </summary>
+        /// <returns>The missing rows from.</returns>
+        /// <param name="other">Other.</param>
+        public CSV GetMissingRowsFrom(CSV other)
+        {
+            CSV output = new CSV();
+
+            foreach(Dictionary<String, String> row in other.Data)
+            {
+                bool found = false;
+                foreach(Dictionary<string, string> checkRow in this.Data)
+                {
+                    if(CompareUniqueFields(checkRow, row))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    output.Add(row);
+                }
+            }
+
+            return output;
+        }
+
+
+        /// <summary>
+        /// Gets the extra rows from this csv which are not present in the other csv.
+        /// </summary>
+        /// <returns>The extra rows from.</returns>
+        /// <param name="other">Other.</param>
+        public CSV GetExtraRowsFrom(CSV other)
+        {
+            CSV output = new CSV();
+            foreach (Dictionary<String, String> row in this.Data)
+            {
+                bool found = false;
+                foreach (Dictionary<string, string> checkRow in other.Data)
+                {
+                    if (CompareUniqueFields(checkRow, row))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    output.Add(row);
+                }
+            }
+
+            return output;
+        }
+
+        #endregion // Comparison
+
+
         public void NormalizeColumns(INormalizationRule rule, List<String> columns)
         {
             rule.Normalize(ref _Data, columns);

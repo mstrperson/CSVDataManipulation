@@ -10,7 +10,7 @@ namespace CSVDataManipulation
         public static void Main(string[] args)
         {
             ExtendedCSV extended = new ExtendedCSV(
-                new FileStream("/Users/jcox/Documents/laptops.csv", FileMode.Open), new List<String>() { "WASP" });
+                new FileStream("/Users/jcox/Documents/loaners.csv", FileMode.Open), new List<String>() { "WASP" });
 
             extended.NormalizeColumns(
                 new MACAddressNormalizationRule()
@@ -21,7 +21,7 @@ namespace CSVDataManipulation
                 new List<String>() { "Serial", "Model" }
             );
 
-            extended.Save("/Users/jcox/Documents/laptopsCleaned.csv");
+            extended.Save("/Users/jcox/Documents/loanersCleaned.csv");
 
             Console.WriteLine("Done!");
             Console.ReadKey();
