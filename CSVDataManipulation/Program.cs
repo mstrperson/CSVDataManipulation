@@ -9,6 +9,25 @@ namespace CSVDataManipulation
     {
         public static void Main(string[] args)
         {
+            Normalize();
+            Console.WriteLine("Done!");
+            Console.ReadKey();
+        }
+
+        public static void Compare()
+        {
+
+            ExtendedCSV extended = new ExtendedCSV(
+                new FileStream("/Users/jcox/Documents/myInventory.csv", FileMode.Open), new List<string>() { "WASP" }
+            );
+
+            CSV other = new CSV(new FileStream("/Users/jcox/Documents/googleInventory.csv", FileMode.Open));
+
+            extended.GetMissingRowsFrom(other).Save("/Users/jcox/Documents/missingInventory.csv");
+        }
+
+        public static void Normalize()
+        {
             ExtendedCSV extended = new ExtendedCSV(
                 new FileStream("/Users/jcox/Documents/loaners.csv", FileMode.Open), new List<String>() { "WASP" });
 
@@ -22,9 +41,6 @@ namespace CSVDataManipulation
             );
 
             extended.Save("/Users/jcox/Documents/loanersCleaned.csv");
-
-            Console.WriteLine("Done!");
-            Console.ReadKey();
         }
 
         public static void Flatten()

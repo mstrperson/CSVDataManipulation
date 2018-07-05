@@ -32,8 +32,16 @@ namespace CSVDataManipulation
         }
     }
 
+    /// <summary>
+    /// MAC Address normalization rule.
+    /// </summary>
     public class MACAddressNormalizationRule : INormalizationRule
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="T:CSVDataManipulation.MACAddressNormalizationRule"/>
+        /// is all caps.
+        /// </summary>
+        /// <value><c>true</c> if capitalize; otherwise, <c>false</c>.</value>
         public bool Capitalize { get; set; }
         public enum MacSeparator
         {
@@ -44,8 +52,17 @@ namespace CSVDataManipulation
 
         private String[] separators = { "", ":", "-" };
 
+        /// <summary>
+        /// Gets or sets the standard separator.
+        /// </summary>
+        /// <value>The separator.</value>
         public MacSeparator Separator { get; set; }
 
+        /// <summary>
+        /// Normalize the MAC Addresses in the specified columns of data according to the configured standards.
+        /// </summary>
+        /// <param name="data">Data.</param>
+        /// <param name="columns">Columns.</param>
         public void Normalize(ref List<Dictionary<string, string>> data, List<string> columns)
         {
             Regex macaddress = new Regex(MatchPattern);
@@ -58,6 +75,7 @@ namespace CSVDataManipulation
 
                     String stripped = "";
                     Regex digit = new Regex("[0-9a-fA-F]");
+
                     foreach(char ch in row[column])
                     {
                         if(digit.IsMatch("" + ch))
@@ -78,7 +96,6 @@ namespace CSVDataManipulation
                         continue;
                     }
 
-
                     String formatted = "";
                     for (int i = 0; i < 12; i+=2)
                     {
@@ -92,6 +109,11 @@ namespace CSVDataManipulation
             }
         }
 
+        /// <summary>
+        /// Gets the match pattern corresponding to a mac address with the 
+        /// configured standard for this instance.
+        /// </summary>
+        /// <value>Regex pattern.</value>
         protected string MatchPattern
         {
             get
