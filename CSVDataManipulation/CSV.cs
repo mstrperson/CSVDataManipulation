@@ -54,6 +54,9 @@ namespace CSVDataManipulation
                     {
                         values[i] = values[i].Substring(1, values[i].Length - 2);
                     }
+
+                    while (row.ContainsKey(headers[i])) headers[i] = headers[i] + " ";
+
                     row.Add(headers[i], values[i]);
                 }
 

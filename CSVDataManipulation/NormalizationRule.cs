@@ -69,7 +69,14 @@ namespace CSVDataManipulation
                     stripped = Capitalize ? stripped.ToUpperInvariant() : stripped.ToLowerInvariant();
 
                     if (stripped.Length != 12)
-                        throw new FormatException("Invalid MAC Address");
+                        continue;
+                        //throw new FormatException("Invalid MAC Address");
+
+                    if( Separator == MacSeparator.None) 
+                    {
+                        row[column] = stripped;
+                        continue;
+                    }
 
 
                     String formatted = "";
@@ -89,15 +96,13 @@ namespace CSVDataManipulation
         {
             get
             {
-                string letter = Capitalize ? "A-F" : "a-F";
+                string letter = Capitalize ? "A-F" : "a-f";
                 if(Separator == MacSeparator.None)
                 {
-                    return "^[" + letter + "0-9]{12}$";
+                    return "^[0-9" + letter + "]{12}$";
                 }
 
-                string separator = Separator == MacSeparator.Colon ? ":" : "-";
-
-                return "^([" + letter + "0-9]{2}" + separator + "){5}[" + letter + "0-9]{2}$";
+                return "^([0-9" + letter + "]{2}" + separators[(int)Separator] + "){5}[" + letter + "0-9]{2}$";
             }
         }
     }

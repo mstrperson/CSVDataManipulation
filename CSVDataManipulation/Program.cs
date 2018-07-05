@@ -9,11 +9,20 @@ namespace CSVDataManipulation
     {
         public static void Main(string[] args)
         {
-            ExtendedCSV ext = new ExtendedCSV(new FileStream("C:\\temp\\test1.csv", FileMode.Open), new List<string>() { "id" });
-            CSV other = new CSV(new FileStream("C:\\temp\\test2.csv", FileMode.Open));
+            ExtendedCSV extended = new ExtendedCSV(
+                new FileStream("/Users/jcox/Documents/laptops.csv", FileMode.Open), new List<String>() { "WASP" });
 
-            ext.Merge(other);
-            ext.Save("C:\\temp\\testOut.csv");
+            extended.NormalizeColumns(
+                new MACAddressNormalizationRule()
+                { Capitalize = false, Separator = MACAddressNormalizationRule.MacSeparator.None },
+                new List<String>() { "Wifi", "Bluetooth", "Ethernet" });
+            extended.NormalizeColumns(
+                new SerialNumberNormalizationRule() { Capitalize = true },
+                new List<String>() { "Serial", "Model" }
+            );
+
+            extended.Save("/Users/jcox/Documents/laptopsCleaned.csv");
+
             Console.WriteLine("Done!");
             Console.ReadKey();
         }
