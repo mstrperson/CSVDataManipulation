@@ -60,6 +60,37 @@ namespace CSVDataManipulation
             return true;
         }
 
+        /// <summary>
+        /// Find the *first* row with specified primaryKey.
+        /// Ideally, this should be the *unique* row with the given primaryKey,
+        /// but this method does not check that.
+        /// </summary>
+        /// <returns>The the row that matches the given primary key or throws <see cref="System.Collections.Generic.KeyNotFoundException"/>.</returns>
+        /// <param name="primaryKey">Primary key.</param>
+        public Dictionary<string, string> Find(Dictionary<string, string> primaryKey)
+        {
+            foreach(Dictionary<string, string> row in this._Data)
+            {
+                bool match = true;
+                foreach(String pk in UniqueFields)
+                {
+                    if (!primaryKey.ContainsKey(pk)) 
+                        throw new InvalidDataException("Provided primaryKey does not contain a required field.");
+                    
+                    if(!row[pk].Equals(primaryKey[pk]))
+                    {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match)
+                    return row;
+            }
+
+            throw new KeyNotFoundException("No row corresponds to the given primary key.");
+        }
+
 
         #region flatten file
         /// <summary>
@@ -151,6 +182,36 @@ namespace CSVDataManipulation
                             }
                         }
                     }
+                }
+            }
+        }
+
+        public void GetDataColumnsFrom(ExtendedCSV other, List<String> columnsToPull)
+        {
+            foreach(Dictionary<string, string> sourceRow in this._Data)
+            {
+                Dictionary<string, string> otherRow;
+                try
+                {
+                    otherRow = other.Find(sourceRow);
+                }
+                catch(KeyNotFoundException)
+                {
+                    // ignore
+
+                    // TODO:  Don't ignore this...
+                    continue;
+                }
+
+                foreach(string column in columnsToPull)
+                {
+                    if (!otherRow.ContainsKey(column))
+                        continue;
+
+                    if (sourceRow.ContainsKey(column))
+                        sourceRow[column] = otherRow[column];
+                    else
+                        sourceRow.Add(column, otherRow[column]);
                 }
             }
         }
