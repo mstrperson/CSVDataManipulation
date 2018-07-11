@@ -9,27 +9,44 @@ namespace CSVDataManipulation
     {
         public static void Main(string[] args)
         {
-            Normalize();
+            Compare();
             Console.WriteLine("Done!");
             Console.ReadKey();
+        }
+
+        public static void Combine()
+        {
+            List<String> files = 
+                Directory.EnumerateFiles("/Users/jcox/Documents/toCombine/").Where(
+                    fn => fn.EndsWith(".csv", StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+            CSV output = new CSV();
+            foreach(string fileName in files)
+            {
+                CSV toAdd = new CSV(new FileStream(fileName, FileMode.Open));
+                output.Add(toAdd);
+            }
+
+            output.Save("/Users/jcox/Documents/combined.csv");
         }
 
         public static void Compare()
         {
 
             ExtendedCSV extended = new ExtendedCSV(
-                new FileStream("/Users/jcox/Documents/myInventory.csv", FileMode.Open), new List<string>() { "WASP" }
+                new FileStream("/Users/jcox/Documents/inventoried_iPads.csv", FileMode.Open), new List<string>() { "WASP" }
             );
 
-            CSV other = new CSV(new FileStream("/Users/jcox/Documents/googleInventory.csv", FileMode.Open));
+            CSV other = new CSV(new FileStream("/Users/jcox/Documents/iPads.csv", FileMode.Open));
 
-            extended.GetMissingRowsFrom(other).Save("/Users/jcox/Documents/missingInventory.csv");
+            extended.GetMissingRowsFrom(other).Save("/Users/jcox/Documents/missing_iPads.csv");
+            extended.GetExtraRowsFrom(other).Save("/Users/jcox/Documents/new_iPads.csv");
         }
 
         public static void Normalize()
         {
             ExtendedCSV extended = new ExtendedCSV(
-                new FileStream("/Users/jcox/Documents/loaners.csv", FileMode.Open), new List<String>() { "WASP" });
+                new FileStream("/Users/jcox/Documents/loanerLaptops.csv", FileMode.Open), new List<String>() { "WASP" });
 
             extended.NormalizeColumns(
                 new MACAddressNormalizationRule()

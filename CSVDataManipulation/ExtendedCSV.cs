@@ -122,7 +122,7 @@ namespace CSVDataManipulation
         #endregion // flatten
 
         #region merge documents
-        
+
         /// <summary>
         /// Merge this ExtendedCSV with another CSV.  
         /// The merger looks for matching unique field rows in the /other/ csv and merges them into this one.
