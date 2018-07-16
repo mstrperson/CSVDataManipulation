@@ -9,9 +9,68 @@ namespace CSVDataManipulation
     {
         public static void Main(string[] args)
         {
-            Compare();
+            /*ConsolidateData("/Users/jcox/Documents/inventoried_lenovo.csv",
+                            "/Users/jcox/Documents/lenovo.csv", 
+                            "/Users/jcox/Documents/lenovo_merged.csv");*/
+            /*Compare("/Users/jcox/Documents/lenovo_merged.csv", 
+                    "/Users/jcox/Documents/lenovo.csv", 
+                    "/Users/jcox/Documents/missing_lenovo.csv",
+                    "/Users/jcox/Documents/new_lenovo.csv");*/
+            //SerialNumberComparison("/Users/jcox/Documents/missing_lenovo.csv", "/Users/jcox/Documents/employee_lenovo.csv");
+            CleanMissing();
+
+
             Console.WriteLine("Done!");
             Console.ReadKey();
+        }
+
+        public static void CleanMissing()
+        {
+            ExtendedCSV extended = new ExtendedCSV(new FileStream("/Users/jcox/Documents/missing_lenovo.csv", FileMode.Open), new List<string>() { "WASP" });
+            ExtendedCSV other = new ExtendedCSV(new FileStream("/Users/jcox/Documents/employee_lenovo.csv", FileMode.Open), new List<string>() { "WASP" });
+
+            foreach (Dictionary<String, String> row in other.Data)
+            {
+                extended.Remove(row);
+            }
+
+            extended.Save("/Users/jcox/Documents/missing_lenovo_cleaned.csv");
+        }
+
+        public static void SerialNumberComparison(String missingFileName, String outputFileName)
+        {
+            ExtendedCSV extended = new ExtendedCSV(
+                new FileStream(missingFileName, FileMode.Open), new List<string>() { "Serial No" });
+
+            ExtendedCSV other = new ExtendedCSV(
+                new FileStream("/Users/jcox/Documents/employee_laptop_serials.csv", FileMode.Open), new List<string>() { "Serial No" })
+            {
+                ConflictRule = new PickTheFirstConflictRule()
+            };
+
+            other.NormalizeColumns(new SerialNumberNormalizationRule() { Capitalize = true }, new List<String>() { "Serial No" });
+
+            other = new ExtendedCSV(other.FlattenRows(), new List<string>() { "Serial No" });
+            other.Save("/Users/jcox/Documents/employee_laptop_serials.csv");
+            ExtendedCSV output = new ExtendedCSV(extended.PullRowsMatchingPrimaryKeysWith(other), new List<String>() { "Serial No" });
+            output.GetDataColumnsFrom(other, new List<String>() { "First", "Last" });
+            output.Save(outputFileName);
+        }
+
+        public static void ConsolidateData(String handsOnFileName, String exportedFileName, String mergedFileName)
+        {
+
+            ExtendedCSV extended = new ExtendedCSV(
+                new FileStream(handsOnFileName, FileMode.Open), new List<string>() { "WASP" }
+            );
+
+            ExtendedCSV other = new ExtendedCSV(
+                new FileStream(exportedFileName, FileMode.Open), new List<string>() { "WASP" }
+            );
+
+            extended.GetDataColumnsFrom(other, new List<string>() { "Serial No", "Model" });
+
+            extended.Save(mergedFileName);
         }
 
         public static void Combine()
@@ -30,17 +89,17 @@ namespace CSVDataManipulation
             output.Save("/Users/jcox/Documents/combined.csv");
         }
 
-        public static void Compare()
+        public static void Compare(String handsOnFileName, String exportedFileName, String missingFileName, String newFileName)
         {
 
             ExtendedCSV extended = new ExtendedCSV(
-                new FileStream("/Users/jcox/Documents/inventoried_iPads.csv", FileMode.Open), new List<string>() { "WASP" }
+                new FileStream(handsOnFileName, FileMode.Open), new List<string>() { "WASP" }
             );
 
-            CSV other = new CSV(new FileStream("/Users/jcox/Documents/iPads.csv", FileMode.Open));
+            CSV other = new CSV(new FileStream(exportedFileName, FileMode.Open));
 
-            extended.GetMissingRowsFrom(other).Save("/Users/jcox/Documents/missing_iPads.csv");
-            extended.GetExtraRowsFrom(other).Save("/Users/jcox/Documents/new_iPads.csv");
+            extended.GetMissingRowsFrom(other).Save(missingFileName);
+            extended.GetExtraRowsFrom(other).Save(newFileName);
         }
 
         public static void Normalize()

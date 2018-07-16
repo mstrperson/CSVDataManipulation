@@ -41,6 +41,16 @@ namespace CSVDataManipulation
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="T:CSVDataManipulation.ExtendedCSV"/> class.
+        /// </summary>
+        /// <param name="toExtend">To extend.</param>
+        /// <param name="uidfields">Uidfields.</param>
+        public ExtendedCSV(CSV toExtend, List<string> uidfields) : base(toExtend.Data)
+        {
+            this.UniqueFields = uidfields;
+        }
+
+        /// <summary>
         /// Compares the unique fields.
         /// </summary>
         /// <returns><c>true</c>, if unique fields was compared, <c>false</c> otherwise.</returns>
@@ -64,6 +74,9 @@ namespace CSVDataManipulation
         /// Find the *first* row with specified primaryKey.
         /// Ideally, this should be the *unique* row with the given primaryKey,
         /// but this method does not check that.
+        /// 
+        /// throws <see cref="System.Collections.Generic.KeyNotFoundException"/> if no match is found.
+        /// throws <see cref="InvalidDataException"/> if the primary key does not contain the appropriate unique fields.
         /// </summary>
         /// <returns>The the row that matches the given primary key or throws <see cref="System.Collections.Generic.KeyNotFoundException"/>.</returns>
         /// <param name="primaryKey">Primary key.</param>
@@ -89,6 +102,23 @@ namespace CSVDataManipulation
             }
 
             throw new KeyNotFoundException("No row corresponds to the given primary key.");
+        }
+
+        new public void Remove(Dictionary<String, String> primaryKey)
+        {
+            try
+            {
+                Dictionary<string, string> match = this.Find(primaryKey);
+                this._Data.Remove(match);
+            }
+            catch (KeyNotFoundException)
+            {
+                
+            }
+            catch(InvalidDataException)
+            {
+                
+            }
         }
 
 
@@ -275,6 +305,29 @@ namespace CSVDataManipulation
                 if (!found)
                 {
                     output.Add(row);
+                }
+            }
+
+            return output;
+        }
+
+        public CSV PullRowsMatchingPrimaryKeysWith(CSV other)
+        {
+            CSV output = new CSV();
+
+            foreach(Dictionary<String, String> row in other.Data)
+            {
+                try
+                {
+                    output.Add(this.Find(row));
+                }
+                catch(KeyNotFoundException)
+                {
+                    continue;
+                }
+                catch(InvalidDataException)
+                {
+                    continue;
                 }
             }
 
