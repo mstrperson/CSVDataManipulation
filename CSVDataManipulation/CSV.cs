@@ -16,13 +16,13 @@ namespace CSVDataManipulation
         public String Heading
         { get; set; }
 
-        private List<Dictionary<String, String>> _Data;
+        protected List<Dictionary<String, String>> _Data;
         public List<Dictionary<String, String>> Data
         {
             get { return _Data; }
         }
 
-        private static Regex Quoted = new Regex("^\"[^\"]*\"$");
+        protected static Regex Quoted = new Regex("^\"[^\"]*\"$");
 
         public CSV(String heading = "")
         {
@@ -54,6 +54,9 @@ namespace CSVDataManipulation
                     {
                         values[i] = values[i].Substring(1, values[i].Length - 2);
                     }
+
+                    while (row.ContainsKey(headers[i])) headers[i] = headers[i] + " ";
+
                     row.Add(headers[i], values[i]);
                 }
 

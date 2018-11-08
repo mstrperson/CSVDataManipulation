@@ -28,6 +28,25 @@ namespace CSVDataManipulation
         }
     }
 
+    /// <summary>
+    /// This is a dummy rule for throwing away extra data that you don't care about.
+    /// No comparison is made.  This rule just returns data with what ever is in the dataA parameter of the conflict column.
+    /// </summary>
+    public class PickTheFirstConflictRule : IConflictRule
+    {
+        /// <summary>
+        /// Does not compare anything. Just returns the data in the first parameter
+        /// </summary>
+        /// <returns>The resolve.</returns>
+        /// <param name="dataA">Data a.</param>
+        /// <param name="dataB">Data b.</param>
+        /// <param name="conflictColumn">Conflict column.</param>
+        public string Resolve(Dictionary<string, string> dataA, Dictionary<string, string> dataB, string conflictColumn)
+        {
+            return dataA[conflictColumn];
+        }
+    }
+
     public class YesBeatsNoConflictRule : IConflictRule
     {
         /// <summary>

@@ -9,13 +9,114 @@ namespace CSVDataManipulation
     {
         public static void Main(string[] args)
         {
-            ExtendedCSV ext = new ExtendedCSV(new FileStream("C:\\temp\\test1.csv", FileMode.Open), new List<string>() { "id" });
-            CSV other = new CSV(new FileStream("C:\\temp\\test2.csv", FileMode.Open));
+            /*ConsolidateData("/Users/jcox/Documents/inventoried_lenovo.csv",
+                            "/Users/jcox/Documents/lenovo.csv", 
+                            "/Users/jcox/Documents/lenovo_merged.csv");*/
+            /*Compare("/Users/jcox/Documents/lenovo_merged.csv", 
+                    "/Users/jcox/Documents/lenovo.csv", 
+                    "/Users/jcox/Documents/missing_lenovo.csv",
+                    "/Users/jcox/Documents/new_lenovo.csv");*/
+            //SerialNumberComparison("/Users/jcox/Documents/missing_lenovo.csv", "/Users/jcox/Documents/employee_lenovo.csv");
+            CleanMissing();
 
-            ext.Merge(other);
-            ext.Save("C:\\temp\\testOut.csv");
+
             Console.WriteLine("Done!");
             Console.ReadKey();
+        }
+
+        public static void CleanMissing()
+        {
+            ExtendedCSV extended = new ExtendedCSV(new FileStream("/Users/jcox/Documents/missing_lenovo.csv", FileMode.Open), new List<string>() { "WASP" });
+            ExtendedCSV other = new ExtendedCSV(new FileStream("/Users/jcox/Documents/employee_lenovo.csv", FileMode.Open), new List<string>() { "WASP" });
+
+            foreach (Dictionary<String, String> row in other.Data)
+            {
+                extended.Remove(row);
+            }
+
+            extended.Save("/Users/jcox/Documents/missing_lenovo_cleaned.csv");
+        }
+
+        public static void SerialNumberComparison(String missingFileName, String outputFileName)
+        {
+            ExtendedCSV extended = new ExtendedCSV(
+                new FileStream(missingFileName, FileMode.Open), new List<string>() { "Serial No" });
+
+            ExtendedCSV other = new ExtendedCSV(
+                new FileStream("/Users/jcox/Documents/employee_laptop_serials.csv", FileMode.Open), new List<string>() { "Serial No" })
+            {
+                ConflictRule = new PickTheFirstConflictRule()
+            };
+
+            other.NormalizeColumns(new SerialNumberNormalizationRule() { Capitalize = true }, new List<String>() { "Serial No" });
+
+            other = new ExtendedCSV(other.FlattenRows(), new List<string>() { "Serial No" });
+            other.Save("/Users/jcox/Documents/employee_laptop_serials.csv");
+            ExtendedCSV output = new ExtendedCSV(extended.PullRowsMatchingPrimaryKeysWith(other), new List<String>() { "Serial No" });
+            output.GetDataColumnsFrom(other, new List<String>() { "First", "Last" });
+            output.Save(outputFileName);
+        }
+
+        public static void ConsolidateData(String handsOnFileName, String exportedFileName, String mergedFileName)
+        {
+
+            ExtendedCSV extended = new ExtendedCSV(
+                new FileStream(handsOnFileName, FileMode.Open), new List<string>() { "WASP" }
+            );
+
+            ExtendedCSV other = new ExtendedCSV(
+                new FileStream(exportedFileName, FileMode.Open), new List<string>() { "WASP" }
+            );
+
+            extended.GetDataColumnsFrom(other, new List<string>() { "Serial No", "Model" });
+
+            extended.Save(mergedFileName);
+        }
+
+        public static void Combine()
+        {
+            List<String> files = 
+                Directory.EnumerateFiles("/Users/jcox/Documents/toCombine/").Where(
+                    fn => fn.EndsWith(".csv", StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+            CSV output = new CSV();
+            foreach(string fileName in files)
+            {
+                CSV toAdd = new CSV(new FileStream(fileName, FileMode.Open));
+                output.Add(toAdd);
+            }
+
+            output.Save("/Users/jcox/Documents/combined.csv");
+        }
+
+        public static void Compare(String handsOnFileName, String exportedFileName, String missingFileName, String newFileName)
+        {
+
+            ExtendedCSV extended = new ExtendedCSV(
+                new FileStream(handsOnFileName, FileMode.Open), new List<string>() { "WASP" }
+            );
+
+            CSV other = new CSV(new FileStream(exportedFileName, FileMode.Open));
+
+            extended.GetMissingRowsFrom(other).Save(missingFileName);
+            extended.GetExtraRowsFrom(other).Save(newFileName);
+        }
+
+        public static void Normalize()
+        {
+            ExtendedCSV extended = new ExtendedCSV(
+                new FileStream("/Users/jcox/Documents/loanerLaptops.csv", FileMode.Open), new List<String>() { "WASP" });
+
+            extended.NormalizeColumns(
+                new MACAddressNormalizationRule()
+                { Capitalize = false, Separator = MACAddressNormalizationRule.MacSeparator.None },
+                new List<String>() { "Wifi", "Bluetooth", "Ethernet" });
+            extended.NormalizeColumns(
+                new SerialNumberNormalizationRule() { Capitalize = true },
+                new List<String>() { "Serial", "Model" }
+            );
+
+            extended.Save("/Users/jcox/Documents/loanersCleaned.csv");
         }
 
         public static void Flatten()
