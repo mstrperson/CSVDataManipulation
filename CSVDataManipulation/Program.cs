@@ -9,16 +9,11 @@ namespace CSVDataManipulation
     {
         public static void Main(string[] args)
         {
-            /*ConsolidateData("/Users/jcox/Documents/inventoried_lenovo.csv",
-                            "/Users/jcox/Documents/lenovo.csv", 
-                            "/Users/jcox/Documents/lenovo_merged.csv");*/
-            /*Compare("/Users/jcox/Documents/lenovo_merged.csv", 
-                    "/Users/jcox/Documents/lenovo.csv", 
-                    "/Users/jcox/Documents/missing_lenovo.csv",
-                    "/Users/jcox/Documents/new_lenovo.csv");*/
-            //SerialNumberComparison("/Users/jcox/Documents/missing_lenovo.csv", "/Users/jcox/Documents/employee_lenovo.csv");
-            CleanMissing();
+            ExtendedCSV csv = new ExtendedCSV(new FileStream("Z:\\Downloads\\174 Computers.csv", FileMode.Open));
 
+            csv.NormalizeColumns(new MACAddressNormalizationRule() { Capitalize = false, Separator = MACAddressNormalizationRule.MacSeparator.None }, new List<String>() { "User Name", "MAC Address" });
+
+            csv.Save("Z:\\Downloads\\labloanersAerohive.csv");
 
             Console.WriteLine("Done!");
             Console.ReadKey();
