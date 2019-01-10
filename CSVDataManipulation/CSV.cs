@@ -4,38 +4,85 @@ using System.Linq;
 using System.Web;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Collections;
 
 /// <summary>
 /// Summary description for CSV
 /// </summary>
 namespace CSVDataManipulation
 {
-    public class CSV
+    public class CSV : IEnumerable<Dictionary<String, String>>
     {
-
+        /// <summary>
+        /// A title or heading for the table.  If you want one...
+        /// </summary>
         public String Heading
         { get; set; }
 
         protected List<Dictionary<String, String>> _Data;
+
+        /// <summary>
+        /// Readonly access to all of the rows of this table.
+        /// </summary>
         public List<Dictionary<String, String>> Data
         {
             get { return _Data; }
         }
 
+        /// <summary>
+        /// Gets the Enumerator for iterrating over this CSV.
+        /// Enumerates the Rows of this CSV.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerator<Dictionary<string, string>> GetEnumerator()
+        {
+            return ((IEnumerable<Dictionary<string, string>>)Data).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable<Dictionary<string, string>>)Data).GetEnumerator();
+        }
+
+        /// <summary>
+        /// Readonly access to the data in this table by row number.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public Dictionary<String,String> this[int index]
+        {
+            get
+            {
+                return this.Data[index];
+            }
+        }
+
         protected static Regex Quoted = new Regex("^\"[^\"]*\"$");
 
+        /// <summary>
+        /// Initialize a blank CSV.
+        /// </summary>
+        /// <param name="heading"></param>
         public CSV(String heading = "")
         {
             Heading = heading;
             _Data = new List<Dictionary<string, string>>();
         }
 
+        /// <summary>
+        /// Initialize a CSV from a List of Dictionaries.
+        /// </summary>
+        /// <param name="data"></param>
         public CSV(List<Dictionary<String, String>> data)
         {
             Heading = "";
             _Data = data;
         }
 
+        /// <summary>
+        /// Open a CSV from a stream.
+        /// </summary>
+        /// <param name="inputStream"></param>
         public CSV(Stream inputStream)
         {
             Heading = "";
@@ -64,13 +111,24 @@ namespace CSVDataManipulation
             }
         }
 
+        /// <summary>
+        /// Add a row to this CSV.
+        /// Resets the AllKeys field.
+        /// </summary>
+        /// <param name="row"></param>
         public void Add(Dictionary<String, String> row)
         {
             _Data.Add(row);
             _AllKeys = new List<string>();
         }
 
-        public Boolean Contains(Dictionary<String, String> row)
+
+        /// <summary>
+        /// Check to see if a row is in this CSV.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <returns></returns>
+        public bool Contains(Dictionary<String, String> row)
         {
             for (int i = 0; i < _Data.Count; i++)
             {
@@ -134,6 +192,10 @@ namespace CSVDataManipulation
             return newCSV;
         }
 
+        /// <summary>
+        /// Remove a row from this CSV.
+        /// </summary>
+        /// <param name="row"></param>
         public void Remove(Dictionary<String, String> row)
         {
             #region Search
@@ -177,6 +239,11 @@ namespace CSVDataManipulation
         }
 
         private List<String> _AllKeys;
+
+        /// <summary>
+        /// Get the list of all keys in this CSV.
+        /// Not every row is guaranteed to have a value for every key.
+        /// </summary>
         public List<String> AllKeys
         {
             get
@@ -200,6 +267,10 @@ namespace CSVDataManipulation
             }
         }
 
+
+        /// <summary>
+        /// How many Columns are in this CSV?
+        /// </summary>
         public int ColCount
         {
             get
@@ -208,6 +279,9 @@ namespace CSVDataManipulation
             }
         }
 
+        /// <summary>
+        /// How many rows are in this CSV?
+        /// </summary>
         public int RowCount
         {
             get
@@ -216,19 +290,21 @@ namespace CSVDataManipulation
             }
         }
 
+        /// <summary>
+        /// Save the CSV to a file.
+        /// This method will delete an existing file with this name.
+        /// </summary>
+        /// <param name="fileName"></param>
         public void Save(String fileName)
         {
-            //"\\/:\\*\\?\"<>\\|"
-            //fileName = fileName.Replace("/", "\\");
-            //Regex invalid = new Regex("[\\*\\?\"<>\\|]");
-            /*foreach (Match match in invalid.Matches(fileName))
-            {
-                fileName = fileName.Replace(match.Value, "");
-            }*/
             if (File.Exists(fileName)) File.Delete(fileName);
             this.Save(new FileStream(fileName, FileMode.OpenOrCreate));
         }
 
+        /// <summary>
+        /// Save the CSV to a stream.
+        /// </summary>
+        /// <param name="output"></param>
         public void Save(Stream output)
         {
             StreamWriter writer = new StreamWriter(output);
@@ -268,12 +344,57 @@ namespace CSVDataManipulation
             writer.Close();
         }
 
+        /// <summary>
+        /// Bulk add data from another CSV object.
+        /// </summary>
+        /// <param name="other"></param>
         public void Add(CSV other)
         {
             foreach (Dictionary<String, String> row in other.Data)
             {
                 this.Add(row);
             }
+        }
+
+        /// <summary>
+        /// Get all of the data in the requested column of the table.
+        /// if an invalid header is given, throws an ArgumentOutOfRangeException.
+        /// </summary>
+        /// <param name="header">Column Header from this table.</param>
+        /// <returns></returns>
+        public List<String> GetColumn(String header)
+        {
+            if (!AllKeys.Contains(header)) throw new ArgumentOutOfRangeException("Invalid Header Name");
+
+            List<String> column = new List<string>();
+            foreach (Dictionary<String, String> row in Data)
+            {
+                column.Add(row[header]);
+            }
+
+            return column;
+        }
+
+        /// <summary>
+        /// Get the first row matching the given headr, key pair.
+        /// if no row under the given header contains the given key, 
+        /// throws an ArgumentOutOfRangeException.
+        /// 
+        /// </summary>
+        /// <param name="header"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public Dictionary<string, string> GetRow(String header, String key)
+        {
+            foreach (Dictionary<string, string> row in Data)
+            {
+                if (row[header].Equals(key))
+                {
+                    return row;
+                }
+            }
+
+            throw new ArgumentOutOfRangeException(String.Format("{0} was not found under the {1} header.", key, header));
         }
     }
 }
