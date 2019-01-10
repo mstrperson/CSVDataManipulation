@@ -57,6 +57,63 @@ namespace CSVDataManipulation
             }
         }
 
+        /// <summary>
+        /// Query this table and find all rows that match a set of values.
+        /// </summary>
+        /// <param name="primaryKey"></param>
+        /// <returns></returns>
+        public CSV this[Dictionary<string, string> primaryKey]
+        {
+            get
+            {
+                CSV output = new CSV();
+                foreach (Dictionary<String, String> row in this)
+                {
+                    foreach (string key in primaryKey.Keys)
+                    {
+                        if (!row.ContainsKey(key) || !row[key].Equals(primaryKey[key]))
+                        {
+                            continue;
+                        }
+                    }
+
+                    output.Add(row);
+                }
+
+                return output;
+            }
+        }
+
+        /// <summary>
+        /// Query this table and find all rows that match a set of regular expressions.
+        /// Use this to find all rows where a data fits a particular set of regular expressions.
+        /// for example, find all rows in a contact list where the Phone Number has a 540 area code
+        /// and the street address is in a particular town.
+        /// </summary>
+        /// <param name="primaryKey"></param>
+        /// <returns></returns>
+        public CSV this[Dictionary<string, Regex> primaryKey]
+        {
+            get
+            {
+                CSV output = new CSV();
+                foreach (Dictionary<String, String> row in this)
+                {
+                    foreach (string key in primaryKey.Keys)
+                    {
+                        if (!row.ContainsKey(key) || !primaryKey[key].IsMatch(row[key]))
+                        {
+                            continue;
+                        }
+                    }
+
+                    output.Add(row);
+                }
+
+                return output;
+            }
+        }
+
         protected static Regex Quoted = new Regex("^\"[^\"]*\"$");
 
         /// <summary>
