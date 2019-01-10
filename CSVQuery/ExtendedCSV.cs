@@ -205,11 +205,7 @@ namespace CSVDataManipulation
                                 // add the missing data to this sheet.
                                 rowA.Add(column, rowB[column]);
                             }
-                            else if(String.IsNullOrWhiteSpace(rowA[column]))
-                            {
-                                rowA[column] = rowB[column];
-                            }
-                            else if(!String.IsNullOrWhiteSpace(rowB[column]) && !rowA[column].Equals(rowB[column]))
+                            else if(!rowA[column].Equals(rowB[column]))
                             {
                                 // check for conflicting data.
                                 rowA[column] = ConflictRule.Resolve(rowA, rowB, column);
