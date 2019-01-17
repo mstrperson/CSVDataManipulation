@@ -9,11 +9,27 @@ namespace CSVDataManipulation
     {
         public static void Main(string[] args)
         {
-            ExtendedCSV csv = new ExtendedCSV(new FileStream("Z:\\Downloads\\174 Computers.csv", FileMode.Open));
+            ExtendedCSV jamf = new ExtendedCSV(new FileStream("Z:\\Jason\\iPads\\jamf.csv", FileMode.Open), new List<string> { "Serial Number" })
+            {
+                ConflictRule = new PickTheFirstConflictRule()
+            };
+            CSV wasp = new CSV(new FileStream("Z:\\Jason\\iPads\\wasp.csv", FileMode.Open));
 
-            csv.NormalizeColumns(new MACAddressNormalizationRule() { Capitalize = false, Separator = MACAddressNormalizationRule.MacSeparator.None }, new List<String>() { "User Name", "MAC Address" });
+            jamf.Merge(wasp);
+            jamf.Save("Z:\\Jason\\iPads\\jamfExtended.csv");
 
-            csv.Save("Z:\\Downloads\\labloanersAerohive.csv");
+            CSV misingFromJamf = new CSV();
+
+            foreach(string serial in wasp["Serial Number"])
+            {
+                if(!String.IsNullOrWhiteSpace(serial) && !jamf["Serial Number"].Contains(serial))
+                {
+                    Console.WriteLine("Jamf does not contain {0}.", serial);
+                    misingFromJamf.Add(wasp["Serial Number", serial]);
+                }
+            }
+
+            misingFromJamf.Save("Z:\\Jason\\iPads\\missingFromJamf.csv");
 
             Console.WriteLine("Done!");
             Console.ReadKey();

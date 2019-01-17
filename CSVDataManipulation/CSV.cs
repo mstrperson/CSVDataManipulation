@@ -114,6 +114,21 @@ namespace CSVDataManipulation
             }
         }
 
+        /// <summary>
+        /// Quick get Column by name.
+        /// </summary>
+        /// <param name="column"></param>
+        /// <returns></returns>
+        public List<String> this[String column] => this.GetColumn(column);
+
+        /// <summary>
+        /// Shortcut for GetRow.
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public Dictionary<String, String> this[String column, String value] => this.GetRow(column, value);
+
         protected static Regex Quoted = new Regex("^\"[^\"]*\"$");
 
         /// <summary>
@@ -426,7 +441,8 @@ namespace CSVDataManipulation
             List<String> column = new List<string>();
             foreach (Dictionary<String, String> row in Data)
             {
-                column.Add(row[header]);
+                if (!row.ContainsKey(header)) column.Add("");
+                else column.Add(row[header]);
             }
 
             return column;
@@ -445,6 +461,8 @@ namespace CSVDataManipulation
         {
             foreach (Dictionary<string, string> row in Data)
             {
+                if (!row.ContainsKey(header)) continue;
+
                 if (row[header].Equals(key))
                 {
                     return row;
